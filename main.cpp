@@ -22,7 +22,7 @@ int ConvertModelFormat(
 	//出力ファイルの拡張子を取得し、出力ファイルのフォーマットを決定する。
 	size_t last_index_of_dot = dst_filepath.find_last_of('.');
 	if (last_index_of_dot == std::string::npos) {
-		std::cerr << "Error: Cannot determine the format of the output file." << std::endl;
+		std::cerr << "Error: Cannot determine the output format." << std::endl;
 		return -1;
 	}
 
