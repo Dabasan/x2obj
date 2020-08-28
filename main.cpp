@@ -6,7 +6,7 @@
 #include<iostream>
 #include<string>
 
-int ConvertModelToOBJ(
+int ConvertModelFormat(
 	const std::string& src_filepath, 
 	const std::string& dst_filepath,
 	unsigned int importerFlags) {
@@ -14,16 +14,39 @@ int ConvertModelToOBJ(
 	const aiScene* scene = importer.ReadFile(src_filepath, importerFlags);
 	if (!scene) {
 		std::string error_message = importer.GetErrorString();
-		std::cout << "Error: " << error_message << std::endl;
+		std::cerr << "Error: " << error_message << std::endl;
 
 		return -1;
 	}
 
+	//出力ファイルの拡張子を取得し、出力ファイルのフォーマットを決定する。
+	size_t last_index_of_dot = dst_filepath.find_last_of('.');
+	if (last_index_of_dot == std::string::npos) {
+		std::cerr << "Error: Cannot determine the format of the output file." << std::endl;
+		return -1;
+	}
+
+	auto extension = dst_filepath.substr(last_index_of_dot + 1);
+
 	Assimp::Exporter exporter;
-	aiReturn ret = exporter.Export(scene, "obj", dst_filepath, scene->mFlags);
+	size_t num_exporters = exporter.GetExportFormatCount();
+	std::string format_id = "";
+	for (int i = 0; i < num_exporters; i++) {
+		const aiExportFormatDesc* format = exporter.GetExportFormatDescription(i);
+		if (format->fileExtension == extension) {
+			format_id = format->id;
+			break;
+		}
+	}
+	if (format_id == "") {
+		std::cerr << "Error: Unsupported output format." << std::endl;
+		return -1;
+	}
+
+	aiReturn ret = exporter.Export(scene, format_id, dst_filepath, scene->mFlags);
 	if (ret == aiReturn_FAILURE) {
 		std::string error_message = exporter.GetErrorString();
-		std::cout << "Error: " << error_message << std::endl;
+		std::cerr << "Error: " << error_message << std::endl;
 
 		return -1;
 	}
@@ -33,17 +56,16 @@ int ConvertModelToOBJ(
 
 int main(int argc, char* argv[]) {
 	if (argc != 3) {
-		std::cout << "Error: Invalid number of command-line arguments." << std::endl;
+		std::cerr << "Error: Invalid number of command-line arguments." << std::endl;
 		return -1;
 	}
 
 	auto src_filepath = std::string(argv[1]);
 	auto dst_filepath = std::string(argv[2]);
 
-	ConvertModelToOBJ(
+	ConvertModelFormat(
 		src_filepath, dst_filepath,
 		aiProcess_CalcTangentSpace |
-		aiProcess_Triangulate|
 		aiProcess_JoinIdenticalVertices |
 		aiProcess_SortByPType
 	);
