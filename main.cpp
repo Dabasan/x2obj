@@ -221,6 +221,11 @@ int main(int argc, char* argv[]) {
 		readFileOptions |= aiProcessPreset_TargetRealtime_Quality;
 	}
 
+	//Set aiProcessPreset_TargetRealtime_Quality as a default option if no options are set
+	if (readFileOptions == 0) {
+		readFileOptions = aiProcessPreset_TargetRealtime_Quality;
+	}
+
 	ConvertModelFormat(inputFilepath, outputFilepath, readFileOptions);
 
 	return 0;
