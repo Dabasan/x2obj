@@ -1,13 +1,15 @@
+#include<iostream>
+#include<string>
+
 #include<assimp/Importer.hpp>
 #include<assimp/Exporter.hpp>
 #include<assimp/scene.h>
 #include<assimp/postprocess.h>
 #include<assimp/version.h>
 
-#include<iostream>
-#include<string>
-
 #include"cxxopts.hpp"
+
+const std::string VERSION_STR = "Model Converter v0.2.0";
 
 int ConvertModelFormat(
 	const std::string& inputFilepath,
@@ -54,8 +56,6 @@ int ConvertModelFormat(
 }
 
 int main(int argc, char* argv[]) {
-	const std::string VERSION_STR = "Model Converter v0.2.0";
-
 	cxxopts::Options options("Model Converter", "Converts model format with Assimp");
 	options.add_options()
 		//General
