@@ -2,6 +2,7 @@
 #include<assimp/Exporter.hpp>
 #include<assimp/scene.h>
 #include<assimp/postprocess.h>
+#include<assimp/version.h>
 
 #include<iostream>
 #include<string>
@@ -101,7 +102,15 @@ int main(int argc, char* argv[]) {
 		return 0;
 	}
 	if (result.count("version") != 0) {
+		//Version of Model Converter
 		std::cout << VERSION_STR << std::endl;
+		std::cout << std::endl;
+		//Version of Assimp
+		std::cout << "Assimp v" << aiGetVersionMajor() << "." << aiGetVersionMinor() << "." << aiGetVersionRevision() << std::endl;
+		std::cout << std::endl;
+		//Legal string of Assimp
+		std::cout << aiGetLegalString() << std::endl;
+
 		return 0;
 	}
 
