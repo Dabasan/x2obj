@@ -56,6 +56,10 @@ int ConvertModelFormat(
 }
 
 int main(int argc, char* argv[]) {
+	if (argc <= 1) {
+		return 0;
+	}
+
 	cxxopts::Options options("Model Converter", "Converts model format with Assimp");
 	options.add_options()
 		//General
