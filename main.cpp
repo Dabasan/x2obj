@@ -9,7 +9,7 @@
 
 #include"cxxopts.hpp"
 
-const std::string VERSION_STR = "Model Converter v0.2.0";
+const std::string VERSION_STR = "Model Converter v1.0.0";
 
 int ConvertModelFormat(
 	const std::string& inputFilepath,
