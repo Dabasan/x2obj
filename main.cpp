@@ -9,47 +9,43 @@
 #include"cxxopts.hpp"
 
 int ConvertModelFormat(
-	const std::string& src_filepath, 
-	const std::string& dst_filepath,
+	const std::string& inputFilepath, 
+	const std::string& outputFilepath,
 	unsigned int importerFlags) {
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(src_filepath, importerFlags);
+	const aiScene* scene = importer.ReadFile(inputFilepath, importerFlags);
 	if (!scene) {
-		std::string error_message = importer.GetErrorString();
-		std::cerr << "Error: " << error_message << std::endl;
-
+		std::cerr << "Error: " << importer.GetErrorString() << std::endl;
 		return -1;
 	}
 
-	//出力ファイルの拡張子を取得し、出力ファイルのフォーマットを決定する。
-	size_t last_index_of_dot = dst_filepath.find_last_of('.');
-	if (last_index_of_dot == std::string::npos) {
-		std::cerr << "Error: Cannot determine the output format." << std::endl;
+	//Get the file extension and determine the output format
+	size_t lastIndexOfDot = outputFilepath.find_last_of('.');
+	if (lastIndexOfDot == std::string::npos) {
+		std::cerr << "Error: Cannot determine the output format from the filepath specified" << std::endl;
 		return -1;
 	}
 
-	auto extension = dst_filepath.substr(last_index_of_dot + 1);
+	auto extension = outputFilepath.substr(lastIndexOfDot + 1);
 
 	Assimp::Exporter exporter;
-	size_t num_exporters = exporter.GetExportFormatCount();
-	std::string format_id = "";
-	for (int i = 0; i < num_exporters; i++) {
+	size_t numExporters = exporter.GetExportFormatCount();
+	std::string formatID = "";
+	for (int i = 0; i < numExporters; i++) {
 		const aiExportFormatDesc* format = exporter.GetExportFormatDescription(i);
 		if (format->fileExtension == extension) {
-			format_id = format->id;
+			formatID = format->id;
 			break;
 		}
 	}
-	if (format_id == "") {
-		std::cerr << "Error: Unsupported output format." << std::endl;
+	if (formatID == "") {
+		std::cerr << "Error: Unsupported output format" << std::endl;
 		return -1;
 	}
 
-	aiReturn ret = exporter.Export(scene, format_id, dst_filepath, scene->mFlags);
+	aiReturn ret = exporter.Export(scene, formatID, outputFilepath, scene->mFlags);
 	if (ret == aiReturn_FAILURE) {
-		std::string error_message = exporter.GetErrorString();
-		std::cerr << "Error: " << error_message << std::endl;
-
+		std::cerr << "Error: " << exporter.GetErrorString() << std::endl;
 		return -1;
 	}
 
@@ -62,8 +58,8 @@ int main(int argc, char* argv[]) {
 	cxxopts::Options options("Model Converter","Converts model format with Assimp");
 	options.add_options()
 		//General
-		("i,input_filepath", "Input filepath", cxxopts::value<std::string>())
-		("o,output_filepath", "Output filepath (must contain extension)", cxxopts::value<std::string>())
+		("i,inputFilepath", "Input filepath", cxxopts::value<std::string>())
+		("o,outputFilepath", "Output filepath (must contain extension)", cxxopts::value<std::string>())
 		("h,help","Displays help")
 		("v,version","Displays version")
 		//Assimp options
@@ -104,115 +100,115 @@ int main(int argc, char* argv[]) {
 		std::cout << options.help() << std::endl;
 		return 0;
 	}
-	else if (result.count("version") != 0) {
+	if (result.count("version") != 0) {
 		std::cout << VERSION_STR << std::endl;
 		return 0;
 	}
 	
-	if (result.count("input_filepath") == 0) {
+	if (result.count("inputFilepath") == 0) {
 		std::cerr << "Error: You must specify input filepath" << std::endl;
 		return -1;
 	}
-	else if (result.count("output_filepath") == 0) {
+	if (result.count("outputFilepath") == 0) {
 		std::cerr << "Error: You must specify output filepath" << std::endl;
 		return -1;
 	}
 
-	auto input_filepath = result["input_filepath"].as<std::string>();
-	auto output_filepath = result["output_filepath"].as<std::string>();
+	auto inputFilepath = result["inputFilepath"].as<std::string>();
+	auto outputFilepath = result["outputFilepath"].as<std::string>();
 
-	unsigned int read_file_options = 0;
+	unsigned int readFileOptions = 0;
 	//Assimp options
 	if (result.count("aiProcess_CalcTangentSpace") != 0) {
-		read_file_options |= aiProcess_CalcTangentSpace;
+		readFileOptions |= aiProcess_CalcTangentSpace;
 	}
 	if (result.count("aiProcess_JoinIdenticalVertices") != 0) {
-		read_file_options |= aiProcess_JoinIdenticalVertices;
+		readFileOptions |= aiProcess_JoinIdenticalVertices;
 	}
 	if (result.count("aiProcess_MakeLeftHanded") != 0) {
-		read_file_options |= aiProcess_MakeLeftHanded;
+		readFileOptions |= aiProcess_MakeLeftHanded;
 	}
 	if (result.count("aiProcess_Triangulate") != 0) {
-		read_file_options |= aiProcess_Triangulate;
+		readFileOptions |= aiProcess_Triangulate;
 	}
 	if (result.count("aiProcess_RemoveComponent") != 0) {
-		read_file_options |= aiProcess_RemoveComponent;
+		readFileOptions |= aiProcess_RemoveComponent;
 	}
 	if (result.count("aiProcess_GenNormals") != 0) {
-		read_file_options |= aiProcess_GenNormals;
+		readFileOptions |= aiProcess_GenNormals;
 	}
 	if (result.count("aiProcess_GenSmoothNormals") != 0) {
-		read_file_options |= aiProcess_GenSmoothNormals;
+		readFileOptions |= aiProcess_GenSmoothNormals;
 	}
 	if (result.count("aiProcess_SplitLargeMeshes") != 0) {
-		read_file_options |= aiProcess_SplitLargeMeshes;
+		readFileOptions |= aiProcess_SplitLargeMeshes;
 	}
 	if (result.count("aiProcess_PreTransformVertices") != 0) {
-		read_file_options |= aiProcess_PreTransformVertices;
+		readFileOptions |= aiProcess_PreTransformVertices;
 	}
 	if (result.count("aiProcess_LimitBoneWeights") != 0) {
-		read_file_options |= aiProcess_LimitBoneWeights;
+		readFileOptions |= aiProcess_LimitBoneWeights;
 	}
 	if (result.count("aiProcess_ValidateDataStructure") != 0) {
-		read_file_options |= aiProcess_ValidateDataStructure;
+		readFileOptions |= aiProcess_ValidateDataStructure;
 	}
 	if (result.count("aiProcess_ImproveCacheLocality") != 0) {
-		read_file_options |= aiProcess_ImproveCacheLocality;
+		readFileOptions |= aiProcess_ImproveCacheLocality;
 	}
 	if (result.count("aiProcess_RemoveRedundantMaterials") != 0) {
-		read_file_options |= aiProcess_RemoveRedundantMaterials;
+		readFileOptions |= aiProcess_RemoveRedundantMaterials;
 	}
 	if (result.count("aiProcess_FixInfacingNormals") != 0) {
-		read_file_options |= aiProcess_FixInfacingNormals;
+		readFileOptions |= aiProcess_FixInfacingNormals;
 	}
 	if (result.count("aiProcess_SortByPType") != 0) {
-		read_file_options |= aiProcess_SortByPType;
+		readFileOptions |= aiProcess_SortByPType;
 	}
 	if (result.count("aiProcess_FindDegenerates") != 0) {
-		read_file_options |= aiProcess_FindDegenerates;
+		readFileOptions |= aiProcess_FindDegenerates;
 	}
 	if (result.count("aiProcess_FindInvalidData") != 0) {
-		read_file_options |= aiProcess_FindInvalidData;
+		readFileOptions |= aiProcess_FindInvalidData;
 	}
 	if (result.count("aiProcess_GenUVCoords") != 0) {
-		read_file_options |= aiProcess_GenUVCoords;
+		readFileOptions |= aiProcess_GenUVCoords;
 	}
 	if (result.count("aiProcess_TransformUVCoords") != 0) {
-		read_file_options |= aiProcess_TransformUVCoords;
+		readFileOptions |= aiProcess_TransformUVCoords;
 	}
 	if (result.count("aiProcess_FindInstances") != 0) {
-		read_file_options |= aiProcess_FindInstances;
+		readFileOptions |= aiProcess_FindInstances;
 	}
 	if (result.count("aiProcess_OptimizeMeshes") != 0) {
-		read_file_options |= aiProcess_OptimizeMeshes;
+		readFileOptions |= aiProcess_OptimizeMeshes;
 	}
 	if (result.count("aiProcess_OptimizeGraph") != 0) {
-		read_file_options |= aiProcess_OptimizeGraph;
+		readFileOptions |= aiProcess_OptimizeGraph;
 	}
 	if (result.count("aiProcess_FlipUVs") != 0) {
-		read_file_options |= aiProcess_FlipUVs;
+		readFileOptions |= aiProcess_FlipUVs;
 	}
 	if (result.count("aiProcess_FlipWindingOrder") != 0) {
-		read_file_options |= aiProcess_FlipWindingOrder;
+		readFileOptions |= aiProcess_FlipWindingOrder;
 	}
 	if (result.count("aiProcess_SplitByBoneCount") != 0) {
-		read_file_options |= aiProcess_SplitByBoneCount;
+		readFileOptions |= aiProcess_SplitByBoneCount;
 	}
 	if (result.count("aiProcess_Debone") != 0) {
-		read_file_options |= aiProcess_Debone;
+		readFileOptions |= aiProcess_Debone;
 	}
 	//Assimp macros
 	if (result.count("aiProcessPreset_TargetRealtime_Fast") != 0) {
-		read_file_options |= aiProcessPreset_TargetRealtime_Fast;
+		readFileOptions |= aiProcessPreset_TargetRealtime_Fast;
 	}
 	if (result.count("aiProcessPreset_TargetRealtime_MaxQuality") != 0) {
-		read_file_options |= aiProcessPreset_TargetRealtime_MaxQuality;
+		readFileOptions |= aiProcessPreset_TargetRealtime_MaxQuality;
 	}
 	if (result.count("aiProcessPreset_TargetRealtime_Quality") != 0) {
-		read_file_options |= aiProcessPreset_TargetRealtime_Quality;
+		readFileOptions |= aiProcessPreset_TargetRealtime_Quality;
 	}
 
-	ConvertModelFormat(input_filepath, output_filepath,read_file_options);
+	ConvertModelFormat(inputFilepath, outputFilepath,readFileOptions);
 
 	return 0;
 }
