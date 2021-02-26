@@ -38,7 +38,7 @@ x2obj.exe -i ak47.x -o ak47.obj --aiProcessPreset_TargetRealtime_Quality
 
 ### バージョン
 
-0.1.0
+0.2.0
 
 ### ライセンス
 
