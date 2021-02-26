@@ -9,7 +9,7 @@
 #include"cxxopts.hpp"
 
 int ConvertModelFormat(
-	const std::string& inputFilepath, 
+	const std::string& inputFilepath,
 	const std::string& outputFilepath,
 	unsigned int importerFlags) {
 	Assimp::Importer importer;
@@ -55,13 +55,13 @@ int ConvertModelFormat(
 int main(int argc, char* argv[]) {
 	const std::string VERSION_STR = "Model Converter v0.2.0";
 
-	cxxopts::Options options("Model Converter","Converts model format with Assimp");
+	cxxopts::Options options("Model Converter", "Converts model format with Assimp");
 	options.add_options()
 		//General
 		("i,inputFilepath", "Input filepath", cxxopts::value<std::string>())
 		("o,outputFilepath", "Output filepath (must contain extension)", cxxopts::value<std::string>())
-		("h,help","Displays help")
-		("v,version","Displays version")
+		("h,help", "Displays help")
+		("v,version", "Displays version")
 		//Assimp options
 		("aiProcess_CalcTangentSpace", "Calculates the tangents and bitangents for the imported meshes")
 		("aiProcess_JoinIdenticalVertices", "Identifies and joins identical vertex data sets within all imported meshes")
@@ -90,9 +90,9 @@ int main(int argc, char* argv[]) {
 		("aiProcess_SplitByBoneCount", "This step splits meshes with many bones into sub-meshes so that each su-bmesh has fewer or as many bones as a given limit")
 		("aiProcess_Debone", "This step removes bones losslessly or according to some threshold")
 		//Assimp macros
-		("aiProcessPreset_TargetRealtime_Fast","")
-		("aiProcessPreset_TargetRealtime_MaxQuality","")
-		("aiProcessPreset_TargetRealtime_Quality","")
+		("aiProcessPreset_TargetRealtime_Fast", "")
+		("aiProcessPreset_TargetRealtime_MaxQuality", "")
+		("aiProcessPreset_TargetRealtime_Quality", "")
 		;
 	auto result = options.parse(argc, argv);
 
@@ -104,7 +104,7 @@ int main(int argc, char* argv[]) {
 		std::cout << VERSION_STR << std::endl;
 		return 0;
 	}
-	
+
 	if (result.count("inputFilepath") == 0) {
 		std::cerr << "Error: You must specify input filepath" << std::endl;
 		return -1;
@@ -208,7 +208,7 @@ int main(int argc, char* argv[]) {
 		readFileOptions |= aiProcessPreset_TargetRealtime_Quality;
 	}
 
-	ConvertModelFormat(inputFilepath, outputFilepath,readFileOptions);
+	ConvertModelFormat(inputFilepath, outputFilepath, readFileOptions);
 
 	return 0;
 }
